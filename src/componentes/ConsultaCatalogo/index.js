@@ -1,13 +1,16 @@
 import { useState, useEffect } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./styles.css";
-import { listaDeProdutos } from "../ProdutoServico";
+import { listaDeProdutos, deleteProduto } from "../ProdutoServico";
 import { useNavigate } from "react-router-dom";
 const ConsultaCatalogo = () => {
   const [produtos, setProdutos] = useState([]);
   const navigator = useNavigate();
 
   useEffect(() => {
+    getAllProdutos();
+  }, []);
+  function getAllProdutos() {
     listaDeProdutos()
       .then((response) => {
         setProdutos(response.data);
@@ -15,12 +18,23 @@ const ConsultaCatalogo = () => {
       .catch((error) => {
         console.error(error);
       });
-  }, []);
+  }
+
   function cadastrarProduto() {
     navigator("/cad-produto");
   }
   function atualizaProduto(id) {
     navigator(`/edit-produto/${id}`);
+  }
+  function exclusaoProduto(id) {
+    console.log(id);
+    deleteProduto(id)
+      .then((response) => {
+        getAllProdutos();
+      })
+      .catch((error) => {
+        console.error(error);
+      });
   }
 
   return (
@@ -54,7 +68,15 @@ const ConsultaCatalogo = () => {
                   className="btn btn-info "
                   onClick={() => atualizaProduto(produto.id)}
                 >
-                  Atualiza
+                  {" "}
+                  Atualiza{" "}
+                </button>
+
+                <button
+                  className="btn btn-info"
+                  onClick={() => exclusaoProduto(produto.id)}
+                >
+                  Exclui
                 </button>
               </td>
             </tr>
