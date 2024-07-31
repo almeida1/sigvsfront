@@ -19,6 +19,10 @@ const ConsultaCatalogo = () => {
   function cadastrarProduto() {
     navigator("/cad-produto");
   }
+  function atualizaProduto(id) {
+    navigator(`/edit-produto/${id}`);
+  }
+
   return (
     <div className="container">
       <h5 className=" text-center ">Consulta Catalogo </h5>
@@ -30,17 +34,29 @@ const ConsultaCatalogo = () => {
           <tr>
             <th>ID</th>
             <th>Descrição</th>
+            <th>Categoria</th>
             <th>Custo</th>
             <th>Quant</th>
+            <th>Ações</th>
           </tr>
         </thead>
+
         <tbody>
           {produtos.map((produto) => (
             <tr key={produto.id}>
               <td>{produto.id}</td>
               <td>{produto.descricao}</td>
+              <td>{produto.categoria}</td>
               <td>{produto.custo}</td>
               <td>{produto.quantidadeNoEstoque}</td>
+              <td>
+                <button
+                  className="btn btn-info "
+                  onClick={() => atualizaProduto(produto.id)}
+                >
+                  Atualiza
+                </button>
+              </td>
             </tr>
           ))}
         </tbody>

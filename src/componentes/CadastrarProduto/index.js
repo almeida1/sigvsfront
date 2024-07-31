@@ -1,6 +1,10 @@
-import React, { useState } from "react";
-import { cadastroDeProduto } from "../ProdutoServico";
-import { useNavigate } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import {
+  cadastroDeProduto,
+  obtemProduto,
+  updateProduto,
+} from "../ProdutoServico";
+import { useNavigate, useParams } from "react-router-dom";
 const CadastrarProduto = () => {
   const [descricao, setDescricao] = useState("");
   const [categoria, setCategoria] = useState("");
@@ -13,6 +17,21 @@ const CadastrarProduto = () => {
     custo: "",
   });
   const navigator = useNavigate();
+  const { id } = useParams();
+  useEffect(() => {
+    if (id) {
+      obtemProduto(id)
+        .then((response) => {
+          setDescricao(response.data.descricao);
+          setCategoria(response.data.categoria);
+          setQuantidade(response.data.quantidadeNoEstoque);
+          setCusto(response.data.custo);
+        })
+        .catch((error) => {
+          console.error(error);
+        });
+    }
+  }, [id]);
 
   function manipulaDescricao(e) {
     setDescricao(e.target.value);
@@ -26,17 +45,38 @@ const CadastrarProduto = () => {
   function manipulaCusto(e) {
     setCusto(e.target.value);
   }
-  function saveProduto(e) {
+  function saveOrUpdateProduto(e) {
     e.preventDefault();
     if (validateForm()) {
-      const produto = { descricao, categoria, quantidadeNoEstoque, custo };
+      const produto = {
+        descricao,
+        categoria,
+        quantidadeNoEstoque: quantidadeNoEstoque.toString(),
+        custo: custo.toString(),
+      };
       console.log(produto);
-      cadastroDeProduto(produto).then((response) => {
-        console.log(response.data);
-        navigator("/produtos");
-      });
+      if (id) {
+        updateProduto(id, produto)
+          .then((response) => {
+            console.log(response.data);
+            navigator("/produtos");
+          })
+          .catch((error) => {
+            console.error(error);
+          });
+      } else {
+        cadastroDeProduto(produto)
+          .then((response) => {
+            console.log(response.data);
+            navigator("/produtos");
+          })
+          .catch((error) => {
+            console.error(error);
+          });
+      }
     }
   }
+
   function validateForm() {
     let valid = true;
     const msgErro = { ...errors };
@@ -52,13 +92,13 @@ const CadastrarProduto = () => {
       msgErro.categoria = "A categoria do produto é obrigatorio. ";
       valid = false;
     }
-    if (quantidadeNoEstoque.trim()) {
+    if (quantidadeNoEstoque.toString().trim()) {
       msgErro.quantidadeNoEstoque = "";
     } else {
       msgErro.quantidadeNoEstoque = "A quantidade deve ser maior que zero. ";
       valid = false;
     }
-    if (custo.trim()) {
+    if (custo.toString().trim()) {
       msgErro.custo = "";
     } else {
       msgErro.custo = "O custo deve ser maior que zero. ";
@@ -67,12 +107,20 @@ const CadastrarProduto = () => {
     setErros(msgErro);
     return valid;
   }
+  function pageTitle() {
+    if (id) {
+      return <h2 className="text-center"> Atualizar Produto</h2>;
+    } else {
+      return <h2 className="text-center"> Cadastrar Produto</h2>;
+    }
+  }
+
   return (
     <div className="container">
       <br /> <br />
       <div className="row">
         <div className="card">
-          <h2 className="text-center"> Cadastrar Produto</h2>
+          {pageTitle()}
           <div className="card-body">
             <form>
               <div className="form-group mb-2">
@@ -111,7 +159,7 @@ const CadastrarProduto = () => {
                 <label className="form-label"> Quantidade:</label>
                 <input
                   type="number"
-                  placeholder="Entre com a quantidade armazenada no estoque do produto"
+                  placeholder="Entre com um numero inteiro da quantidade armazenada no estoque do produto"
                   name="quantidadeNoEstoque"
                   value={quantidadeNoEstoque}
                   className={`form-control ${
@@ -140,7 +188,7 @@ const CadastrarProduto = () => {
                   <div className="invalid-feedback"> {errors.custo}</div>
                 )}
               </div>
-              <button className="btn btn-success" onClick={saveProduto}>
+              <button className="btn btn-success" onClick={saveOrUpdateProduto}>
                 Submit{" "}
               </button>
             </form>
