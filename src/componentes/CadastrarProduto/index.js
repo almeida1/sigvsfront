@@ -5,6 +5,7 @@ import {
   updateProduto,
 } from "../ProdutoServico";
 import { useNavigate, useParams } from "react-router-dom";
+
 const CadastrarProduto = () => {
   const [descricao, setDescricao] = useState("");
   const [categoria, setCategoria] = useState("");
@@ -16,8 +17,10 @@ const CadastrarProduto = () => {
     quantidadeNoEstoque: "",
     custo: "",
   });
+  const [errorMessage, setErrorMessage] = useState(""); // Novo estado para a mensagem de erro
   const navigator = useNavigate();
   const { id } = useParams();
+
   useEffect(() => {
     if (id) {
       obtemProduto(id)
@@ -29,6 +32,7 @@ const CadastrarProduto = () => {
         })
         .catch((error) => {
           console.error(error);
+          setErrorMessage("Erro ao obter produto. Tente novamente mais tarde.");
         });
     }
   }, [id]);
@@ -63,6 +67,9 @@ const CadastrarProduto = () => {
           })
           .catch((error) => {
             console.error(error);
+            setErrorMessage(
+              "Erro ao atualizar produto. Tente novamente mais tarde."
+            );
           });
       } else {
         cadastroDeProduto(produto)
@@ -72,6 +79,9 @@ const CadastrarProduto = () => {
           })
           .catch((error) => {
             console.error(error);
+            setErrorMessage(
+              "Erro ao cadastrar produto. Tente novamente mais tarde."
+            );
           });
       }
     }
@@ -83,13 +93,13 @@ const CadastrarProduto = () => {
     if (descricao.trim()) {
       msgErro.descricao = "";
     } else {
-      msgErro.descricao = "A descrição do produto é obrigatorio. ";
+      msgErro.descricao = "A descrição do produto é obrigatória. ";
       valid = false;
     }
     if (categoria.trim()) {
       msgErro.categoria = "";
     } else {
-      msgErro.categoria = "A categoria do produto é obrigatorio. ";
+      msgErro.categoria = "A categoria do produto é obrigatória. ";
       valid = false;
     }
     if (quantidadeNoEstoque.toString().trim()) {
@@ -107,11 +117,12 @@ const CadastrarProduto = () => {
     setErros(msgErro);
     return valid;
   }
+
   function pageTitle() {
     if (id) {
-      return <h2 className="text-center"> Atualizar Produto</h2>;
+      return <h2 className="text-center">Atualizar Produto</h2>;
     } else {
-      return <h2 className="text-center"> Cadastrar Produto</h2>;
+      return <h2 className="text-center">Cadastrar Produto</h2>;
     }
   }
 
@@ -122,9 +133,12 @@ const CadastrarProduto = () => {
         <div className="card">
           {pageTitle()}
           <div className="card-body">
+            {errorMessage && (
+              <div className="alert alert-danger">{errorMessage}</div>
+            )}
             <form>
               <div className="form-group mb-2">
-                <label className="form-label"> Descrição:</label>
+                <label className="form-label">Descrição:</label>
                 <input
                   type="text"
                   placeholder="Entre com a descrição do produto"
@@ -140,7 +154,7 @@ const CadastrarProduto = () => {
                 )}
               </div>
               <div className="form-group mb-2">
-                <label className="form-label"> Categoria:</label>
+                <label className="form-label">Categoria:</label>
                 <input
                   type="text"
                   placeholder="Entre com a categoria a qual o produto pertence"
@@ -156,10 +170,10 @@ const CadastrarProduto = () => {
                 )}
               </div>
               <div className="form-group mb-2">
-                <label className="form-label"> Quantidade:</label>
+                <label className="form-label">Quantidade:</label>
                 <input
                   type="number"
-                  placeholder="Entre com um numero inteiro da quantidade armazenada no estoque do produto"
+                  placeholder="Entre com um número inteiro da quantidade armazenada no estoque do produto"
                   name="quantidadeNoEstoque"
                   value={quantidadeNoEstoque}
                   className={`form-control ${
@@ -169,13 +183,12 @@ const CadastrarProduto = () => {
                 ></input>
                 {errors.quantidadeNoEstoque && (
                   <div className="invalid-feedback">
-                    {" "}
                     {errors.quantidadeNoEstoque}
                   </div>
                 )}
               </div>
               <div className="form-group mb-2">
-                <label className="form-label"> Custo:</label>
+                <label className="form-label">Custo:</label>
                 <input
                   type="number"
                   placeholder="Entre com o custo do produto"
@@ -198,4 +211,5 @@ const CadastrarProduto = () => {
     </div>
   );
 };
+
 export default CadastrarProduto;
