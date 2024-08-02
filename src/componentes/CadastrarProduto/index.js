@@ -32,7 +32,9 @@ const CadastrarProduto = () => {
         })
         .catch((error) => {
           console.error(error);
-          setErrorMessage("Erro ao obter produto. Tente novamente mais tarde.");
+          setErrorMessage(
+            "Erro ao cadastrar produto. Verifique as informações envidas."
+          );
         });
     }
   }, [id]);
@@ -68,7 +70,7 @@ const CadastrarProduto = () => {
           .catch((error) => {
             console.error(error);
             setErrorMessage(
-              "Erro ao atualizar produto. Tente novamente mais tarde."
+              "Erro ao atualizar produto. Verifique as informações enviadas."
             );
           });
       } else {
